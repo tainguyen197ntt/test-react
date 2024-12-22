@@ -6,7 +6,7 @@ interface ComponentNameProps {
   // Define your props here
 }
 
-const ComponentName: React.FC<ComponentNameProps> = ({ props }) => {
+const ComponentName: React.FC<ComponentNameProps> = () => {
   const registerServiceWorker = () => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
