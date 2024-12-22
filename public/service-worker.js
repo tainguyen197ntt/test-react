@@ -16,7 +16,6 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  console.log(event.request);
   if (
     event.request.method !== "GET" ||
     ["font", "style", "script"].includes(event.request.destination)
@@ -31,7 +30,6 @@ self.addEventListener("fetch", (event) => {
         return cachedResponse;
       }
 
-      console.log("Network request", event.request.url);
       return fetch(event.request);
     })
   );

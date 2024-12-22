@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { Ubuntu } from "next/font/google";
-import { useEffect } from "react";
 import Link from "next/link";
 import React from "react";
+
 const ubuntu_font = Ubuntu({
   weight: ["400", "700"],
   subsets: ["latin"],
@@ -12,6 +11,8 @@ const ubuntu_font = Ubuntu({
 });
 
 export default function Home() {
+  const [isWorkerReady, setIsWorkerReady] = React.useState(false);
+
   const requestNotificationPermission = () => {
     if ("Notification" in window) {
       Notification.requestPermission()
@@ -85,11 +86,7 @@ export default function Home() {
 
   const subscribeToPush = async (registration: any) => {
     const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_KEY as string;
-    console.log(
-      "Public Vapid Key:",
-      process.env.NEXT_PUBLIC_API_URL,
-      process.env.NEXT_PUBLIC_VAPID_KEY
-    );
+
     const convertedVapidKey = urlBase64ToUint8Array(publicVapidKey);
 
     try {
@@ -126,16 +123,39 @@ export default function Home() {
       });
   };
 
+  const checkServiceWorker = () => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        if (registrations.length > 0) {
+          console.log("Service Worker is ready", registrations);
+          setIsWorkerReady(true);
+        }
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    checkServiceWorker();
+  }, []);
+
   return (
     <div className={ubuntu_font.className}>
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+          <h1 className="text-3xl sm:text-5xl font-bold text-center">
+            Welcome to the Home Page
+          </h1>
+          <div className="flex gap-4 items-center flex-col sm:flex-row">
+            {isWorkerReady
+              ? "Service Worker is ready"
+              : "Service Worker is not ready"}
+          </div>
           <div className="flex gap-4 items-center flex-col sm:flex-row">
             <div
               onClick={requestNotificationPermission}
               className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
             >
-              Click here to enable notifications
+              (FE) Click here to enable notifications
             </div>
             <div className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5">
               <Link href="/home">Home</Link>
@@ -144,30 +164,21 @@ export default function Home() {
               onClick={sendData}
               className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
             >
-              Send Data to Service Worker
+              (FE) Send Data to Service Worker
             </div>
           </div>
-          <div className="flex gap-4 items-center flex-col sm:flex-row">
-            <div
-              onClick={fetchingAPI}
-              className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            >
-              Get API
-            </div>
-          </div>
-
           <div className="flex gap-4 items-center flex-col sm:flex-row">
             <div
               onClick={checkApi}
               className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
             >
-              Check Get API
+              (BE) Check Get API
             </div>
             <div
               onClick={sendApiToNotification}
               className="cursor-pointer rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
             >
-              Send API to show notification
+              (BE) Send API to show notification
             </div>
           </div>
         </main>
